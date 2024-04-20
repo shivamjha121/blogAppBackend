@@ -7,6 +7,12 @@ import loginController from './controllers/login.controller.js';
 import passport from 'passport';
 import './passport.js'
 import session from 'express-session';
+import addPosts from './controllers/addPosts.controller.js';
+import getAllPosts from './controllers/getAllPosts.controller.js';
+import userPost from './controllers/getUserPosts.controller.js';
+import editPost from './controllers/editPost.controller.js';
+import {addBookmarks,getBookmarks} from './controllers/addBookmarks.contoller.js';
+import sendFilterData from './controllers/sendFilterData.controller.js';
 connectDB();
 const app =express();
 
@@ -24,7 +30,11 @@ app.use(session({
 app.get('/',(req,res)=>{
     const data=req.query.data;
     console.log(data);
-   res.json({message:"Hello World",user:JSON.parse(data)});
+ if(data){
+    res.send(data);
+ }else{
+    res.send("no data");
+ }
 })
 
 app.post('/signup',signupController);
@@ -35,7 +45,7 @@ app.post('/login',loginController);
 app.get('/auth/google',
   passport.authenticate('google', { scope: ['profile'] }));
 
-  app.get('/auth/google/callback',
+app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home
@@ -44,6 +54,21 @@ app.get('/auth/google',
   });
 
 
+  //posts
+
+  app.post('/addPosts', addPosts);
+  app.get('/getAllPosts',getAllPosts );
+  app.get('/userPost/:userId',userPost);
+  app.get('/editPost',editPost);
+
+
+//bookmarks
+app.post('/addBookmarks',addBookmarks);
+app.get('/getBookmarks/:userId',getBookmarks);
+
+
+//filter
+app.post('/sendFilterData/:catagory',sendFilterData);
 
 app.listen(PORT,()=>{
     console.log(`Server is running on http://localhost:${PORT}`);
